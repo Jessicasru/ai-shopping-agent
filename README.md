@@ -40,7 +40,7 @@ Each product image is analyzed against your style profile. Claude provides:
 - Style notes
 - Suggested pairings
 
-## Supported Retailers
+## Supported Retailers [WIP]
 
 | Retailer | Status | Method |
 |----------|--------|--------|

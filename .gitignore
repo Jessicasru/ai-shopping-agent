@@ -1,0 +1,35 @@
+# Environment
+.env
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Data files (keep structure, ignore contents)
+data/style_profiles/*.png
+data/style_profiles/*.jpg
+data/style_profiles/*.jpeg
+data/style_profiles/*.webp
+data/style_profiles/profile.json
+data/scraped_items/*.json
+data/debug_*.html
+data/feed.html
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Playwright
+playwright/.cache/

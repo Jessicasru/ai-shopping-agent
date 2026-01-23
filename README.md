@@ -168,7 +168,7 @@ TOP MATCHES FOR YOU
 
 ### HTML Feed
 
-The agent generates a beautiful, responsive HTML feed:
+The agent generates a responsive HTML feed:
 
 ![Feed Preview](data/feed-preview.png)
 

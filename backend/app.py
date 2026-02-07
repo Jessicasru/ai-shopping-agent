@@ -17,7 +17,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 from src.vision.style_analyzer import StyleAnalyzer, StyleProfile
 from src.vision.product_matcher import ProductMatcher, MatchResult
 from src.models.product import Product
-from backend.models import init_db, get_all_products
+from backend.models import init_db, get_all_products, save_products
 
 app = Flask(__name__)
 CORS(app)
@@ -191,6 +191,26 @@ def find_matches():
             json.dump(recommendations, f, indent=2)
 
         return jsonify(recommendations)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# ── POST /api/admin/scrape-sezane ─────────────────────────────────
+@app.route("/api/admin/scrape-sezane", methods=["POST"])
+def scrape_and_save():
+    """Scrape Sezane and save products to database."""
+    try:
+        from src.scrapers.sezane import SezaneScraper
+
+        scraper = SezaneScraper()
+        products = scraper.scrape_new_arrivals()
+        product_dicts = [p.to_dict() for p in products]
+        saved = save_products(product_dicts)
+
+        return jsonify({
+            "success": True,
+            "scraped": saved,
+        })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

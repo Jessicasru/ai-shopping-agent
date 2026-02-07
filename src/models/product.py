@@ -11,10 +11,12 @@ class Product:
     url: str
     image_url: str
     retailer: str
+    id: Optional[int] = None
     category: Optional[str] = None
     colors: list[str] = field(default_factory=list)
     sizes: list[str] = field(default_factory=list)
     description: Optional[str] = None
+    scraped_at: Optional[str] = None
 
     def to_dict(self) -> dict:
         return {

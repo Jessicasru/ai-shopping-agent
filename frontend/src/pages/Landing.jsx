@@ -5,10 +5,10 @@ export default function Landing() {
   return (
     <div className="mx-auto max-w-4xl px-6 py-24 text-center">
       <h1 className="font-serif text-5xl md:text-6xl tracking-tight text-[hsl(var(--foreground))]">
-        Your AI Personal Stylist
+        Your Personal AI Stylist
       </h1>
       <p className="mt-6 text-base text-[hsl(var(--muted-foreground))] max-w-xl mx-auto leading-relaxed">
-        Upload photos of outfits you love, and our AI analyzes your unique style
+        Upload photos of outfits you love. We'll analyze your unique style
         to find perfect matches from curated retailers like S&eacute;zane.
       </p>
 

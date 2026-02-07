@@ -18,7 +18,7 @@ export default function Landing() {
           className="group inline-flex items-center justify-center gap-2 rounded-full bg-[hsl(var(--foreground))] px-8 py-3.5 text-sm tracking-[0.1em] uppercase text-[hsl(var(--background))] hover:opacity-90 transition-opacity"
         >
           <Sparkles className="h-4 w-4 transition-transform group-hover:rotate-12" />
-          Get Started
+          Get started
         </Link>
         <Link
           to="/matches"
@@ -32,17 +32,17 @@ export default function Landing() {
         {[
           {
             step: '01',
-            title: 'Upload Style Photos',
+            title: 'Upload style photos',
             desc: 'Share outfit photos, Pinterest inspiration, or items you love.',
           },
           {
             step: '02',
-            title: 'AI Analyzes Your Style',
+            title: 'AI analyzes your style',
             desc: 'Claude vision extracts your color palette, silhouettes, and aesthetic preferences.',
           },
           {
             step: '03',
-            title: 'Get Personalized Picks',
+            title: 'Get personalized picks',
             desc: 'See scored product matches with styling notes and pairing suggestions.',
           },
         ].map(({ step, title, desc }) => (

@@ -65,7 +65,7 @@ export default function Matches() {
       <div className="flex items-end justify-between">
         <div>
           <h1 className="font-serif text-3xl md:text-4xl tracking-tight text-[hsl(var(--foreground))]">
-            Your Matches
+            Your matches
           </h1>
           <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
             {data.matches_found} matches from {data.products_analyzed} products analyzed

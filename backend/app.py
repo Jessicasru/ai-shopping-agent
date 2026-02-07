@@ -176,5 +176,7 @@ print("All routes registered successfully!")
 print("Routes:", [str(rule) for rule in app.url_map.iter_rules()])
 
 
-if __name__ == "__main__":
-    app.run(debug=True, port=5001)
+if __name__ == '__main__':
+    import os
+    port = int(os.environ.get('PORT', 5001))
+    app.run(host='0.0.0.0', port=port, debug=True)

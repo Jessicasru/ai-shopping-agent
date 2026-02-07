@@ -53,7 +53,7 @@ export default function Upload() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
       <h1 className="font-serif text-3xl md:text-4xl tracking-tight text-[hsl(var(--foreground))]">
-        Upload Style Photos
+        Upload style photos
       </h1>
       <p className="mt-3 text-sm text-[hsl(var(--muted-foreground))]">
         Add outfit photos, fashion inspiration, or screenshots of items you love.

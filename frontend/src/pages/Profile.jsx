@@ -35,7 +35,7 @@ export default function Profile() {
   if (!profile) {
     return (
       <div className="mx-auto max-w-2xl px-6 py-24 text-center">
-        <h2 className="font-serif text-2xl text-[hsl(var(--foreground))]">No Style Profile Yet</h2>
+        <h2 className="font-serif text-2xl text-[hsl(var(--foreground))]">No style profile yet</h2>
         <p className="mt-3 text-sm text-[hsl(var(--muted-foreground))]">
           Upload some style inspiration photos to get started.
         </p>
@@ -43,7 +43,7 @@ export default function Profile() {
           to="/upload"
           className="mt-6 inline-flex items-center gap-2 rounded-full bg-[hsl(var(--foreground))] px-6 py-2.5 text-sm tracking-[0.1em] uppercase text-[hsl(var(--background))] hover:opacity-90 transition-opacity"
         >
-          Upload Photos
+          Upload photos
         </Link>
       </div>
     );
@@ -52,7 +52,7 @@ export default function Profile() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
       <h1 className="font-serif text-3xl md:text-4xl tracking-tight text-[hsl(var(--foreground))]">
-        Your Style Profile
+        Your style profile
       </h1>
 
       {profile.summary && (
@@ -96,7 +96,7 @@ export default function Profile() {
           className="group inline-flex items-center gap-2.5 rounded-full bg-[hsl(var(--foreground))] px-8 py-3.5 text-sm tracking-[0.1em] uppercase text-[hsl(var(--background))] hover:opacity-90 transition-opacity"
         >
           <Sparkles className="h-4 w-4 transition-transform group-hover:rotate-12" />
-          Find Matches
+          Find matches
         </Link>
       </div>
     </div>

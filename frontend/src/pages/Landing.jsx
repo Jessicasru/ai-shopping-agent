@@ -5,7 +5,7 @@ export default function Landing() {
   return (
     <div className="mx-auto max-w-4xl px-6 py-24 text-center">
       <h1 className="font-serif text-5xl md:text-6xl tracking-tight text-[hsl(var(--foreground))]">
-        Your Personal AI Stylist
+        Your personal AI stylist
       </h1>
       <p className="mt-6 text-base text-[hsl(var(--muted-foreground))] max-w-xl mx-auto leading-relaxed">
         Upload photos of outfits you love. We'll analyze your unique style
@@ -24,7 +24,7 @@ export default function Landing() {
           to="/matches"
           className="inline-flex items-center justify-center rounded-full border border-[hsl(var(--border))] px-8 py-3.5 text-sm tracking-[0.1em] uppercase text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] hover:border-[hsl(var(--foreground)/0.3)] transition-colors"
         >
-          View Matches
+          View matches
         </Link>
       </div>
 

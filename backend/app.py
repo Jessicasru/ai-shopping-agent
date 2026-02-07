@@ -1,5 +1,6 @@
 """Flask API for the AI Personal Shopping Agent."""
 
+import os
 import sys
 import json
 import uuid
@@ -16,9 +17,18 @@ sys.path.insert(0, str(PROJECT_ROOT))
 from src.vision.style_analyzer import StyleAnalyzer, StyleProfile
 from src.vision.product_matcher import ProductMatcher, MatchResult
 from src.models.product import Product
+from backend.models import init_db, get_all_products
 
 app = Flask(__name__)
 CORS(app)
+
+# Initialize database tables on startup
+if os.environ.get("DATABASE_URL"):
+    try:
+        init_db()
+        print("Database initialized successfully.")
+    except Exception as e:
+        print(f"Database init skipped: {e}")
 
 DATA_DIR = PROJECT_ROOT / "data"
 PROFILES_DIR = DATA_DIR / "style_profiles"
@@ -36,7 +46,17 @@ def allowed_file(filename: str) -> bool:
 # ── GET /api/products ──────────────────────────────────────────────
 @app.route("/api/products", methods=["GET"])
 def get_products():
-    """Return cached scraped products."""
+    """Return products from database, falling back to JSON file."""
+    if os.environ.get("DATABASE_URL"):
+        try:
+            products = get_all_products()
+            return jsonify({
+                "total_products": len(products),
+                "products": products,
+            })
+        except Exception as e:
+            print(f"Database read failed, falling back to JSON: {e}")
+
     products_file = SCRAPED_DIR / "latest_arrivals.json"
     if not products_file.exists():
         return jsonify({"error": "No products found. Run scrapers first."}), 404
@@ -129,15 +149,23 @@ def find_matches():
     with open(profile_file) as f:
         profile = StyleProfile.from_dict(json.load(f))
 
-    # Load products
-    products_file = SCRAPED_DIR / "latest_arrivals.json"
-    if not products_file.exists():
-        return jsonify({"error": "No products found. Run scrapers first."}), 400
+    # Load products from database, falling back to JSON
+    products_data = None
+    if os.environ.get("DATABASE_URL"):
+        try:
+            products_data = get_all_products()
+        except Exception as e:
+            print(f"Database read failed, falling back to JSON: {e}")
 
-    with open(products_file) as f:
-        products_data = json.load(f)
-
-    products = [Product(**p) for p in products_data["products"]]
+    if products_data is not None:
+        products = [Product(**p) for p in products_data]
+    else:
+        products_file = SCRAPED_DIR / "latest_arrivals.json"
+        if not products_file.exists():
+            return jsonify({"error": "No products found. Run scrapers first."}), 400
+        with open(products_file) as f:
+            raw = json.load(f)
+        products = [Product(**p) for p in raw["products"]]
 
     # Get parameters from request body
     body = request.get_json(silent=True) or {}
@@ -177,6 +205,5 @@ print("Routes:", [str(rule) for rule in app.url_map.iter_rules()])
 
 
 if __name__ == '__main__':
-    import os
     port = int(os.environ.get('PORT', 5001))
     app.run(host='0.0.0.0', port=port, debug=True)

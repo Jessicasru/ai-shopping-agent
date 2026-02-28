@@ -7,9 +7,9 @@ import Matches from './pages/Matches';
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-gray-50 font-[Inter,sans-serif]">
+    <div className="min-h-screen bg-background">
       <Nav />
-      <main>
+      <main className="pt-[4.5rem]">
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/upload" element={<Upload />} />

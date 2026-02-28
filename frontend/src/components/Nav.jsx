@@ -1,37 +1,55 @@
-import { Link, useLocation } from 'react-router-dom';
-
-const links = [
-  { to: '/', label: 'Home' },
-  { to: '/upload', label: 'Upload' },
-  { to: '/profile', label: 'Profile' },
-  { to: '/matches', label: 'Matches' },
-];
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Menu, X } from 'lucide-react';
 
 export default function Nav() {
-  const { pathname } = useLocation();
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="border-b border-[hsl(var(--border))] bg-[hsl(var(--card))]">
-      <div className="mx-auto max-w-6xl px-6 flex items-center justify-between h-16">
-        <Link to="/" className="font-serif text-lg tracking-tight text-[hsl(var(--foreground))]">
-          Style agent
+    <motion.nav
+      initial={{ y: -10, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.8, delay: 0.2 }}
+      className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md"
+    >
+      <div className="max-w-7xl mx-auto px-8 py-5 flex items-center justify-between">
+        <Link to="/" className="font-display text-xl tracking-[0.15em] font-semibold text-foreground uppercase">
+          Stylai
         </Link>
-        <div className="flex gap-1">
-          {links.map(({ to, label }) => (
-            <Link
-              key={to}
-              to={to}
-              className={`px-3 py-1.5 rounded-full text-xs tracking-[0.08em] uppercase transition-colors ${
-                pathname === to
-                  ? 'bg-[hsl(var(--foreground))] text-[hsl(var(--background))]'
-                  : 'text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]'
-              }`}
-            >
-              {label}
-            </Link>
-          ))}
+
+        <div className="hidden md:flex items-center gap-10 font-body text-[13px] tracking-[0.08em] uppercase">
+          <Link to="/upload" className="text-muted-foreground hover:text-foreground transition-colors duration-300">
+            The Scan
+          </Link>
+          <Link to="/profile" className="text-muted-foreground hover:text-foreground transition-colors duration-300">
+            Your Profile
+          </Link>
+          <Link to="/matches" className="text-muted-foreground hover:text-foreground transition-colors duration-300">
+            Curated Picks
+          </Link>
+          <span className="w-px h-4 bg-border" />
+          <Link to="/upload" className="text-primary hover:text-primary/80 transition-colors duration-300 font-medium">
+            Begin
+          </Link>
         </div>
+
+        <button className="md:hidden text-foreground" onClick={() => setIsOpen(!isOpen)}>
+          {isOpen ? <X size={22} /> : <Menu size={22} />}
+        </button>
       </div>
-    </nav>
+
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="md:hidden border-t border-border bg-background px-8 py-6 space-y-4"
+        >
+          <Link to="/upload" onClick={() => setIsOpen(false)} className="block text-sm text-muted-foreground tracking-wide uppercase">The Scan</Link>
+          <Link to="/profile" onClick={() => setIsOpen(false)} className="block text-sm text-muted-foreground tracking-wide uppercase">Your Profile</Link>
+          <Link to="/matches" onClick={() => setIsOpen(false)} className="block text-sm text-muted-foreground tracking-wide uppercase">Curated Picks</Link>
+        </motion.div>
+      )}
+    </motion.nav>
   );
 }

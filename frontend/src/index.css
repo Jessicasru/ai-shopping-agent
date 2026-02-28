@@ -1,28 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap');
+
 @import "tailwindcss";
 
 @theme {
-  --font-serif: "Playfair Display", Georgia, serif;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
 }
 
 :root {
-  --background: 0 0% 100%;
-  --foreground: 0 0% 9%;
-  --card: 0 0% 100%;
-  --card-foreground: 0 0% 9%;
-  --muted: 0 0% 96%;
-  --muted-foreground: 0 0% 45%;
-  --border: 0 0% 90%;
-  --ring: 0 0% 9%;
-  --dropzone: 0 0% 98%;
-  --dropzone-hover: 0 0% 96%;
+  --background: 36 33% 96%;
+  --foreground: 20 8% 15%;
+
+  --card: 36 30% 93%;
+  --card-foreground: 20 8% 15%;
+
+  --primary: 350 45% 30%;
+  --primary-foreground: 36 33% 96%;
+
+  --muted: 30 15% 90%;
+  --muted-foreground: 20 5% 48%;
+
+  --border: 30 18% 86%;
+  --input: 30 18% 86%;
+
+  --dropzone: 36 33% 98%;
+  --dropzone-hover: 36 30% 94%;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: "Inter", system-ui, sans-serif;
+  font-family: var(--font-body);
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@layer utilities {
+  .editorial-frame {
+    border: 1px solid hsl(var(--border));
+    padding: 6px;
+    background: hsl(var(--background));
+  }
+
+  .text-editorial-accent {
+    color: hsl(var(--primary));
+  }
+
+  .bg-editorial-warm {
+    background: hsl(30 20% 92%);
+  }
 }

@@ -203,9 +203,12 @@ def scrape_and_save():
         from src.scrapers.sezane import SezaneScraper
 
         scraper = SezaneScraper()
-        products = scraper.scrape_new_arrivals()
-        product_dicts = [p.to_dict() for p in products]
-        saved = save_products(product_dicts)
+        try:
+            products = scraper.scrape_new_arrivals()
+            product_dicts = [p.to_dict() for p in products]
+            saved = save_products(product_dicts)
+        finally:
+            scraper.close()
 
         return jsonify({
             "success": True,

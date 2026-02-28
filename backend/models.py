@@ -12,6 +12,17 @@ class Base(DeclarativeBase):
     pass
 
 
+class UserProfile(Base):
+    __tablename__ = "user_profiles"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    email: Mapped[str] = mapped_column(String(500), unique=True, index=True)
+    style_profile: Mapped[dict] = mapped_column(JSONB)
+    matches: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
 class Product(Base):
     __tablename__ = "products"
 
@@ -110,3 +121,45 @@ def get_all_products() -> list[dict]:
             .all()
         )
         return [p.to_dict() for p in products]
+
+
+def get_user_by_email(email: str) -> dict | None:
+    """Return a user's saved profile and matches, or None if not found."""
+    engine = get_engine()
+    with Session(engine) as session:
+        user = session.query(UserProfile).filter_by(email=email.lower().strip()).first()
+        if not user:
+            return None
+        return {
+            "email": user.email,
+            "style_profile": user.style_profile,
+            "matches": user.matches,
+            "created_at": user.created_at.isoformat() if user.created_at else None,
+            "updated_at": user.updated_at.isoformat() if user.updated_at else None,
+        }
+
+
+def save_user_profile(email: str, profile: dict) -> None:
+    """Upsert a user's style profile (keyed by email)."""
+    engine = get_engine()
+    email = email.lower().strip()
+    with Session(engine) as session:
+        existing = session.query(UserProfile).filter_by(email=email).first()
+        if existing:
+            existing.style_profile = profile
+            existing.updated_at = datetime.utcnow()
+        else:
+            session.add(UserProfile(email=email, style_profile=profile))
+        session.commit()
+
+
+def save_user_matches(email: str, matches: dict) -> None:
+    """Save match results for an existing user."""
+    engine = get_engine()
+    email = email.lower().strip()
+    with Session(engine) as session:
+        user = session.query(UserProfile).filter_by(email=email).first()
+        if user:
+            user.matches = matches
+            user.updated_at = datetime.utcnow()
+            session.commit()

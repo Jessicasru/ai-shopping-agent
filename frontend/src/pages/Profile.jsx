@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Sparkles } from 'lucide-react';
-import { getProfile } from '../api';
+import { getProfile, getUserByEmail } from '../api';
 
 const SECTION_LABELS = {
   color_palette: 'Color Palette',
@@ -18,10 +18,21 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getProfile().then((data) => {
+    const load = async () => {
+      const email = localStorage.getItem('userEmail');
+      if (email) {
+        const user = await getUserByEmail(email);
+        if (user?.style_profile) {
+          setProfile(user.style_profile);
+          setLoading(false);
+          return;
+        }
+      }
+      const data = await getProfile();
       setProfile(data);
       setLoading(false);
-    });
+    };
+    load();
   }, []);
 
   if (loading) {

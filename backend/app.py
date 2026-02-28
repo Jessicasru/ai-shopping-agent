@@ -17,7 +17,10 @@ sys.path.insert(0, str(PROJECT_ROOT))
 from src.vision.style_analyzer import StyleAnalyzer, StyleProfile
 from src.vision.product_matcher import ProductMatcher, MatchResult
 from src.models.product import Product
-from backend.models import init_db, get_all_products, save_products
+from backend.models import (
+    init_db, get_all_products, save_products,
+    get_user_by_email, save_user_profile, save_user_matches,
+)
 
 app = Flask(__name__)
 CORS(app)
@@ -126,8 +129,16 @@ def analyze_style():
         analyzer = StyleAnalyzer()
         profile = analyzer.analyze_style_images(saved_paths)
 
-        # Save profile
+        # Save profile to file
         analyzer.save_profile(profile, PROFILES_DIR / "profile.json")
+
+        # Persist to DB if email provided
+        email = request.form.get("email", "").strip()
+        if email and os.environ.get("DATABASE_URL"):
+            try:
+                save_user_profile(email, profile.to_dict())
+            except Exception as e:
+                print(f"Failed to save user profile for {email}: {e}")
 
         return jsonify({
             "profile": profile.to_dict(),
@@ -186,9 +197,17 @@ def find_matches():
             "recommendations": [r.to_dict() for r in results],
         }
 
-        # Cache results
+        # Cache results to file
         with open(SCRAPED_DIR / "recommendations.json", "w") as f:
             json.dump(recommendations, f, indent=2)
+
+        # Persist to DB if email provided
+        email = body.get("email", "").strip()
+        if email and os.environ.get("DATABASE_URL"):
+            try:
+                save_user_matches(email, recommendations)
+            except Exception as e:
+                print(f"Failed to save matches for {email}: {e}")
 
         return jsonify(recommendations)
     except Exception as e:
@@ -214,6 +233,21 @@ def scrape_and_save():
             "success": True,
             "scraped": saved,
         })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# ── GET /api/user/<email> ─────────────────────────────────────────
+@app.route("/api/user/<path:email>", methods=["GET"])
+def get_user(email):
+    """Return a user's saved style profile and match results by email."""
+    if not os.environ.get("DATABASE_URL"):
+        return jsonify({"error": "Database not configured"}), 503
+    try:
+        user = get_user_by_email(email)
+        if not user:
+            return jsonify({"error": "No profile found for this email"}), 404
+        return jsonify(user)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

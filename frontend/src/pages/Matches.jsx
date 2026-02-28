@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ProductCard } from '../components/ProductCard';
-import { getRecommendations, findMatches } from '../api';
+import { getRecommendations, findMatches, getUserByEmail } from '../api';
 
 export default function Matches() {
   const [data, setData] = useState(null);
@@ -10,17 +10,29 @@ export default function Matches() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    getRecommendations().then((d) => {
+    const load = async () => {
+      const email = localStorage.getItem('userEmail');
+      if (email) {
+        const user = await getUserByEmail(email);
+        if (user?.matches) {
+          setData(user.matches);
+          setLoading(false);
+          return;
+        }
+      }
+      const d = await getRecommendations();
       setData(d);
       setLoading(false);
-    });
+    };
+    load();
   }, []);
 
   const handleRunMatching = async () => {
     setMatching(true);
     setError(null);
     try {
-      const result = await findMatches({ limit: 25, min_score: 6 });
+      const email = localStorage.getItem('userEmail') || undefined;
+      const result = await findMatches({ limit: 25, min_score: 6, email });
       setData(result);
     } catch (err) {
       setError(err.message);

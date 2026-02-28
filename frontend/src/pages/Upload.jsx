@@ -4,16 +4,49 @@ import { Sparkles } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { StyleDropzone } from '../components/StyleDropzone';
 import { ImageGrid } from '../components/ImageGrid';
-import { analyzeStyle } from '../api';
+import { analyzeStyle, getUserByEmail } from '../api';
 
 const MIN_FILES = 10;
 const MAX_FILES = 15;
+
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
 
 export default function Upload() {
   const navigate = useNavigate();
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [email, setEmail] = useState(() => localStorage.getItem('userEmail') || '');
+  const [retrieving, setRetrieving] = useState(false);
+  const [retrieveError, setRetrieveError] = useState(null);
+
+  const handleEmailChange = useCallback((e) => {
+    setEmail(e.target.value);
+    localStorage.setItem('userEmail', e.target.value);
+    setRetrieveError(null);
+  }, []);
+
+  const handleRetrieve = useCallback(async () => {
+    if (!isValidEmail(email)) return;
+    setRetrieving(true);
+    setRetrieveError(null);
+    try {
+      const user = await getUserByEmail(email);
+      if (user?.matches) {
+        navigate('/matches');
+      } else if (user?.style_profile) {
+        navigate('/profile');
+      } else {
+        setRetrieveError('No saved profile found for this email.');
+      }
+    } catch {
+      setRetrieveError('No saved profile found for this email.');
+    } finally {
+      setRetrieving(false);
+    }
+  }, [email, navigate]);
 
   const handleFilesAdded = useCallback((files) => {
     const newImages = files.map((file) => ({
@@ -27,9 +60,7 @@ export default function Upload() {
   const handleRemove = useCallback((id) => {
     setImages((prev) => {
       const image = prev.find((img) => img.id === id);
-      if (image) {
-        URL.revokeObjectURL(image.url);
-      }
+      if (image) URL.revokeObjectURL(image.url);
       return prev.filter((img) => img.id !== id);
     });
   }, []);
@@ -41,14 +72,14 @@ export default function Upload() {
     setLoading(true);
     setError(null);
     try {
-      await analyzeStyle(images.map((img) => img.file));
+      await analyzeStyle(images.map((img) => img.file), email || undefined);
       navigate('/profile');
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  }, [isReady, images, navigate]);
+  }, [isReady, images, email, navigate]);
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
@@ -58,6 +89,41 @@ export default function Upload() {
       <p className="mt-3 text-sm text-[hsl(var(--muted-foreground))]">
         Add outfit photos, fashion inspiration, or screenshots of items you love.
       </p>
+
+      {/* Email */}
+      <div className="mt-10 mb-2">
+        <label className="text-xs tracking-[0.15em] uppercase text-[hsl(var(--muted-foreground))]">
+          Your email
+        </label>
+        <p className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">
+          Save your profile and retrieve it on future visits.
+        </p>
+        <div className="mt-3 flex gap-3">
+          <input
+            type="email"
+            value={email}
+            onChange={handleEmailChange}
+            placeholder="you@example.com"
+            className="flex-1 rounded-full border border-[hsl(var(--border))] bg-transparent px-4 py-2.5 text-sm text-[hsl(var(--foreground))] placeholder:text-[hsl(var(--muted-foreground))] focus:outline-none focus:border-[hsl(var(--foreground)/0.4)] transition-colors"
+          />
+          <button
+            type="button"
+            onClick={handleRetrieve}
+            disabled={!isValidEmail(email) || retrieving}
+            className={cn(
+              'shrink-0 rounded-full border px-5 py-2.5 text-xs tracking-[0.1em] uppercase transition-colors',
+              isValidEmail(email) && !retrieving
+                ? 'border-[hsl(var(--foreground)/0.3)] text-[hsl(var(--foreground))] hover:border-[hsl(var(--foreground))] cursor-pointer'
+                : 'border-[hsl(var(--border))] text-[hsl(var(--muted-foreground))] cursor-not-allowed',
+            )}
+          >
+            {retrieving ? 'Loading...' : 'Retrieve profile'}
+          </button>
+        </div>
+        {retrieveError && (
+          <p className="mt-2 text-xs text-[hsl(var(--muted-foreground))]">{retrieveError}</p>
+        )}
+      </div>
 
       {/* Dropzone */}
       <section aria-label="Image upload area" className="mt-8 mb-8">
@@ -94,8 +160,7 @@ export default function Upload() {
           </div>
           <p className="mt-2.5 text-center text-xs text-[hsl(var(--muted-foreground))]">
             {MIN_FILES - images.length} more image
-            {MIN_FILES - images.length !== 1 ? 's' : ''} needed to unlock
-            analysis
+            {MIN_FILES - images.length !== 1 ? 's' : ''} needed to unlock analysis
           </p>
         </div>
       )}
